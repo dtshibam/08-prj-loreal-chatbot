@@ -5,106 +5,135 @@
   padding: 0;
 }
 
+/* L’Oréal Brand Colors */
+:root {
+  --loreal-black: #000000;
+  --loreal-gold: #c4a163; /* Elegant Gold */
+  --loreal-white: #ffffff;
+  --bg-soft: #f9f9f9;
+  --text-muted: #666666;
+}
+
 /* —— body + fonts —— */
 body {
-  font-family: "Montserrat", Arial, Helvetica, sans-serif;
-  color: #333;
+  font-family: "Montserrat", Arial, sans-serif;
+  color: var(--loreal-black);
+  background-color: var(--loreal-white);
   display: flex;
   justify-content: center;
+  line-height: 1.6;
 }
 
 .page-wrapper {
-  width: 90%;
-  max-width: 900px;
+  width: 95%;
+  max-width: 800px;
 }
 
 /* header */
 .site-header {
   text-align: center;
-  padding-top: 50px;
+  padding: 60px 0 30px;
+  border-bottom: 1px solid #eee;
+}
+
+.brand-logo {
+  width: 180px;
+  margin-bottom: 15px;
 }
 
 .site-title {
-  font-size: 22px;
-  font-weight: 500;
-  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 4px; /* Luxury spacing */
+  color: var(--loreal-black);
+}
+
+/* LevelUp: Last Question Display */
+.last-question-display {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 15px;
+  padding-left: 10px;
 }
 
 /* chat window */
 .chatbox {
-  margin: 40px 0;
+  margin: 30px 0;
 }
 
 .chat-window {
-  height: 360px;
-  border: 1px solid #000;
-  padding: 20px;
-  font-size: 18px;
-  line-height: 1.5;
+  height: 450px;
+  border: 1px solid #e0e0e0;
+  padding: 25px;
+  font-size: 15px;
   overflow-y: auto;
-  background: #fafafa;
-  white-space: pre-line;
+  background: var(--bg-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-radius: 4px;
 }
 
-/* messages */
+/* LevelUp: Chat Bubbles Logic */
 .msg {
-  margin-bottom: 14px;
-  line-height: 1.5;
+  max-width: 80%;
+  padding: 12px 18px;
+  border-radius: 20px;
+  position: relative;
+  word-wrap: break-word;
 }
 
 .msg.user {
-  color: #000;
+  align-self: flex-end;
+  background-color: var(--loreal-black);
+  color: var(--loreal-white);
+  border-bottom-right-radius: 2px;
 }
 
 .msg.ai {
-  color: #666666;
+  align-self: flex-start;
+  background-color: var(--loreal-white);
+  color: var(--loreal-black);
+  border: 1px solid #e0e0e0;
+  border-bottom-left-radius: 2px;
 }
 
 /* input row */
 .chat-form {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 0; /* Connected look */
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .chat-form input {
   flex: 1;
-  padding: 12px;
-  border: 1px solid #ccc;
-  font-size: 18px;
+  padding: 15px;
+  border: 1px solid var(--loreal-black);
+  border-right: none;
+  font-size: 16px;
+  font-family: inherit;
 }
 
 .chat-form input:focus {
-  outline: 2px solid #000;
-  outline-offset: 2px;
+  outline: none;
+  background-color: #fff;
 }
 
 .chat-form button {
-  font-size: 18px;
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 12px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--loreal-black);
+  color: var(--loreal-gold); /* Gold icon on black button */
+  border: 1px solid var(--loreal-black);
+  padding: 0 20px;
   cursor: pointer;
-  transition: background 0.3s;
-}
-
-.chat-form button .material-icons {
-  font-size: 24px;
+  transition: all 0.3s;
 }
 
 .chat-form button:hover {
-  background: #666666;
-}
-
-.chat-form button:focus {
-  outline: 2px solid #000;
-  outline-offset: 2px;
+  background: #333;
+  color: #fff;
 }
 
 /* visually hidden */
@@ -122,22 +151,34 @@ body {
 
 /* footer */
 .site-footer {
-  margin: 60px 0 40px;
+  margin: 40px 0;
   text-align: center;
-  font-size: 14px;
-  color: #666;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .site-footer nav {
-  margin-top: 12px;
+  margin-top: 15px;
 }
 
 .site-footer a {
-  margin: 0 8px;
-  color: #000;
+  margin: 0 12px;
+  color: var(--loreal-black);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .site-footer a:hover {
-  color: #666666;
+  color: var(--loreal-gold);
+}
+
+/* Scrollbar styling for that polished feel */
+.chat-window::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-window::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
 }
