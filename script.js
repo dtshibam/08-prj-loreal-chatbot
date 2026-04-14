@@ -3,10 +3,15 @@ const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
 const chatWindow = document.getElementById("chatWindow");
 
-// LevelUp: Element to show the last question (Make sure this ID is in your HTML)
+// LevelUp: Element to show the last question above the response
+// (Make sure <div id="lastQuestion" class="last-question-display"></div> is in your HTML)
 const lastQuestionDisplay = document.getElementById("lastQuestion");
 
-// LevelUp: Maintain Conversation History (context awareness)
+/* 🔗 YOUR CLOUDFLARE WORKER URL */
+const workerUrl = "https://mute-math-5738.dtshibam.workers.dev";
+
+/* 🧠 LevelUp: Maintain Conversation History */
+// This array stores the context so the AI remembers previous parts of the chat.
 let history = [
   { 
     role: "system", 
@@ -14,8 +19,8 @@ let history = [
   }
 ];
 
-/* Initial message */
-appendMessage("👋 Hello! I am your L'Oréal Beauty Advisor. How can I help you today?", "ai");
+/* Initial greeting */
+appendMessage("👋 Hello! I am your L'Oréal Beauty Advisor. How can I help you find the perfect routine today?", "ai");
 
 /* Handle form submit */
 chatForm.addEventListener("submit", async (e) => {
@@ -29,34 +34,33 @@ chatForm.addEventListener("submit", async (e) => {
     lastQuestionDisplay.textContent = `You asked: "${message}"`;
   }
 
-  // Add user message to UI and history
+  // Add user message to UI and history array
   appendMessage(message, "user");
   history.push({ role: "user", content: message });
   
-  // Clear input field
+  // Clear input field for the next message
   userInput.value = "";
 
-  // Show thinking state
-  const thinkingId = appendMessage("Thinking...", "ai");
+  // Show a temporary "Thinking..." message
+  const thinkingId = appendMessage("L'Oréal Advisor is thinking...", "ai");
 
   try {
-    // API Call to OpenAI (Using your secrets.js key)
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    // POST request to your Cloudflare Worker
+    const res = await fetch(workerUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${api_key}` // Pulls from your secrets.js
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: history
+        messages: history // Sending the full history for context
       })
     });
 
     const data = await res.json();
     
-    // Remove "Thinking..." message
-    document.getElementById(thinkingId).remove();
+    // Remove the "Thinking..." bubble before showing the real answer
+    const thinkingElement = document.getElementById(thinkingId);
+    if (thinkingElement) thinkingElement.remove();
 
     if (data.choices && data.choices[0]) {
       const aiResponse = data.choices[0].message.content;
@@ -65,31 +69,36 @@ chatForm.addEventListener("submit", async (e) => {
       appendMessage(aiResponse, "ai");
       history.push({ role: "assistant", content: aiResponse });
     } else {
-      throw new Error("Invalid API Response");
+      throw new Error("Invalid Response from Worker");
     }
 
   } catch (error) {
-    console.error("Error:", error);
-    document.getElementById(thinkingId).remove();
-    appendMessage("I'm sorry, I encountered a connection error. Please try again later.", "ai");
+    console.error("Connection Error:", error);
+    // Remove thinking message and show error
+    const thinkingElement = document.getElementById(thinkingId);
+    if (thinkingElement) thinkingElement.remove();
+    
+    appendMessage("I'm sorry, I'm having trouble connecting to my database. Please try again.", "ai");
   }
 });
 
 /**
  * Helper function to create chat bubbles
- * Matches the CSS classes: .msg.user and .msg.ai
+ * This handles the LevelUp for "Chat Conversation UI"
+ * sender: 'user' or 'ai'
  */
 function appendMessage(text, sender) {
   const msgDiv = document.createElement("div");
   const msgId = "msg-" + Date.now();
   
   msgDiv.id = msgId;
+  // This matches the .msg.user and .msg.ai classes in your CSS
   msgDiv.className = `msg ${sender}`;
   msgDiv.textContent = text;
   
   chatWindow.appendChild(msgDiv);
   
-  // Auto-scroll to bottom
+  // Auto-scroll the window so the newest message is always visible
   chatWindow.scrollTop = chatWindow.scrollHeight;
   
   return msgId;
