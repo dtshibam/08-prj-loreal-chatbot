@@ -2,16 +2,12 @@
 const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
 const chatWindow = document.getElementById("chatWindow");
-
-// LevelUp: Element to show the last question above the response
-// (Make sure <div id="lastQuestion" class="last-question-display"></div> is in your HTML)
 const lastQuestionDisplay = document.getElementById("lastQuestion");
 
-/* 🔗 YOUR CLOUDFLARE WORKER URL */
+/* 🔗 CLOUDFLARE WORKER CONFIGURATION */
 const workerUrl = "https://mute-math-5738.dtshibam.workers.dev";
 
-/* 🧠 LevelUp: Maintain Conversation History */
-// This array stores the context so the AI remembers previous parts of the chat.
+/* 🧠 LevelUp: Conversation History (Context Awareness) */
 let history = [
   { 
     role: "system", 
@@ -19,7 +15,7 @@ let history = [
   }
 ];
 
-/* Initial greeting */
+// Initial greeting
 appendMessage("👋 Hello! I am your L'Oréal Beauty Advisor. How can I help you find the perfect routine today?", "ai");
 
 /* Handle form submit */
@@ -38,27 +34,22 @@ chatForm.addEventListener("submit", async (e) => {
   appendMessage(message, "user");
   history.push({ role: "user", content: message });
   
-  // Clear input field for the next message
+  // Clear input
   userInput.value = "";
 
-  // Show a temporary "Thinking..." message
+  // Show thinking state
   const thinkingId = appendMessage("L'Oréal Advisor is thinking...", "ai");
 
   try {
-    // POST request to your Cloudflare Worker
     const res = await fetch(workerUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        messages: history // Sending the full history for context
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: history })
     });
 
     const data = await res.json();
     
-    // Remove the "Thinking..." bubble before showing the real answer
+    // Remove "Thinking..." message
     const thinkingElement = document.getElementById(thinkingId);
     if (thinkingElement) thinkingElement.remove();
 
@@ -69,36 +60,33 @@ chatForm.addEventListener("submit", async (e) => {
       appendMessage(aiResponse, "ai");
       history.push({ role: "assistant", content: aiResponse });
     } else {
-      throw new Error("Invalid Response from Worker");
+      throw new Error("Invalid Response");
     }
 
   } catch (error) {
-    console.error("Connection Error:", error);
-    // Remove thinking message and show error
+    console.error("Error:", error);
     const thinkingElement = document.getElementById(thinkingId);
     if (thinkingElement) thinkingElement.remove();
-    
-    appendMessage("I'm sorry, I'm having trouble connecting to my database. Please try again.", "ai");
+    appendMessage("I'm sorry, I'm having trouble connecting to my beauty database.", "ai");
   }
 });
 
 /**
  * Helper function to create chat bubbles
- * This handles the LevelUp for "Chat Conversation UI"
- * sender: 'user' or 'ai'
+ * Matches CSS classes: .msg.user and .msg.ai (or .user-message/.ai-message)
  */
 function appendMessage(text, sender) {
   const msgDiv = document.createElement("div");
   const msgId = "msg-" + Date.now();
   
   msgDiv.id = msgId;
-  // This matches the .msg.user and .msg.ai classes in your CSS
-  msgDiv.className = `msg ${sender}`;
+  // This uses 'user' or 'ai' to apply the correct CSS styling
+  msgDiv.className = `message ${sender}-message`;
   msgDiv.textContent = text;
   
   chatWindow.appendChild(msgDiv);
   
-  // Auto-scroll the window so the newest message is always visible
+  // Auto-scroll to bottom
   chatWindow.scrollTop = chatWindow.scrollHeight;
   
   return msgId;
